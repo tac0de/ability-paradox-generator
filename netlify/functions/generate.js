@@ -16,17 +16,12 @@ exports.handler = async (event) => {
 
     const SYSTEM_PROMPT = `
 You generate ONE short anime-style sentence.
-The sentence must describe:
-- a powerful ability
-- a serious cost or limitation
-
-Do not write a story.
-Do not include names.
-Keep it natural and concise.
+Describe a powerful ability and its serious drawback.
+No names. No story. One sentence only.
 `;
 
     const USER_PROMPT = `
-Write the sentence in ${outputLanguage}.
+Write it naturally in ${outputLanguage}.
 
 Example:
 "Can stop time, but loses a year of life each time the power is used."
@@ -59,27 +54,46 @@ Now write a new sentence.
 
     const raw = await res.json();
 
+    // 🔴 핵심: 모든 경로를 커버하는 텍스트 추출기
     let text = "";
 
-    const output = Array.isArray(raw?.output) ? raw.output : [];
-    for (const item of output) {
-      if (item?.type === "message" && Array.isArray(item.content)) {
-        text = item.content
-          .filter((c) => c.type === "output_text")
-          .map((c) => c.text)
-          .join("");
-        if (text.trim()) break;
+    // 1) output_text shortcut
+    if (typeof raw.output_text === "string") {
+      text = raw.output_text;
+    }
+
+    // 2) output[].type === "output_text"
+    if (!text && Array.isArray(raw.output)) {
+      for (const item of raw.output) {
+        if (item?.type === "output_text" && typeof item.text === "string") {
+          text += item.text;
+        }
       }
     }
 
-    if (!text.trim()) {
-      throw new Error("Empty OpenAI output");
+    // 3) output[].content[].type === "output_text"
+    if (!text && Array.isArray(raw.output)) {
+      for (const item of raw.output) {
+        if (Array.isArray(item.content)) {
+          for (const c of item.content) {
+            if (c.type === "output_text" && typeof c.text === "string") {
+              text += c.text;
+            }
+          }
+        }
+      }
+    }
+
+    text = text.trim();
+
+    if (!text) {
+      throw new Error("Model returned no usable text");
     }
 
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ result: text.trim() }),
+      body: JSON.stringify({ result: text }),
     };
   } catch (err) {
     return {
