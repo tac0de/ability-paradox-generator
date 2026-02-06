@@ -133,13 +133,18 @@ h1 {
   background-clip: text;
   font-weight: 700;
   letter-spacing: -0.5px;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .desc {
   color: var(--muted);
   margin: 0 0 24px;
-  line-height: 1.6;
+  line-height: 1.5;
   font-size: 0.95rem;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 select {
@@ -171,6 +176,8 @@ button {
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 600;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 #generateBtn {
@@ -182,6 +189,8 @@ button {
   box-shadow: var(--glow);
   position: relative;
   overflow: hidden;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 #generateBtn::before {
@@ -249,6 +258,8 @@ button:disabled {
   opacity: 0;
   transform: translateY(20px);
   transition: all 0.4s ease;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 #resultText.show {
@@ -359,12 +370,16 @@ button:disabled {
   background-clip: text;
   margin-bottom: 8px;
   animation: textGlow 2s ease-in-out infinite;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .loading-subtext {
   font-size: 0.85rem;
   color: var(--muted);
   animation: fadeInOut 3s ease-in-out infinite;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 @keyframes textGlow {
@@ -402,6 +417,8 @@ button:disabled {
   color: var(--text);
   border: 1px solid var(--border);
   cursor: pointer;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .action-btn:hover {
@@ -708,45 +725,38 @@ button:disabled {
   }
 
   h1 {
-    font-size: 1.4rem;
+    font-size: 1.15rem;
+    letter-spacing: -0.3px;
   }
 
   .desc {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
   }
 
   .stats {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    max-width: 100%;
+    margin-top: 24px;
   }
 
   .stat-card {
-    padding: 12px 8px;
+    padding: 16px 20px;
   }
 
   .stat-icon {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
   }
 
   .stat-value {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
   }
 
   .stat-label {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
   }
 
   .result {
     padding: 16px;
-  }
-
-  .history-actions {
-    flex-direction: column;
-  }
-
-  .history-action-btn {
-    width: 100%;
-    flex: none;
   }
 
   .header-actions {
@@ -760,6 +770,16 @@ button:disabled {
 
   select {
     padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+
+  #generateBtn {
+    font-size: 0.95rem;
+    padding: 14px 20px;
+  }
+
+  .action-btn {
     font-size: 0.85rem;
+    padding: 10px 14px;
   }
 }
