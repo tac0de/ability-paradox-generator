@@ -1,5 +1,5 @@
-export default async (req) => {
-  if (req.method !== "POST") {
+exports.handler = async (event) => {
+  if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
       body: "Method Not Allowed",
@@ -7,7 +7,7 @@ export default async (req) => {
   }
 
   try {
-    const { lang } = JSON.parse(req.body);
+    const { lang } = JSON.parse(event.body);
 
     const languageMap = {
       ko: "Korean",
@@ -29,9 +29,6 @@ Rules:
 - Focus on ability and its cost or limitation
 - Tone: anime / dramatic / concise
 - Output language: ${outputLanguage}
-
-Example (do NOT reuse):
-"Can stop time, but loses one year of lifespan each time the ability is used."
 `;
 
     const response = await fetch("https://api.openai.com/v1/responses", {
@@ -48,22 +45,16 @@ Example (do NOT reuse):
     });
 
     const data = await response.json();
-
-    // Responses API는 output_text가 있으면 이걸 쓰는 게 제일 안전
     const text = data.output_text || data.output?.[0]?.content?.[0]?.text || "";
-
-    if (!text) {
-      throw new Error("Empty response");
-    }
 
     return {
       statusCode: 200,
       body: JSON.stringify({ result: text.trim() }),
     };
-  } catch (error) {
+  } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Generation failed" }),
+      body: JSON.stringify({ error: err.message }),
     };
   }
 };
