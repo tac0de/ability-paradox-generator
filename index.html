@@ -18,7 +18,7 @@
   <body>
     <main class="container">
       <header class="top">
-        <h1 id="title">Ability Paradox Generator</h1>
+        <h1 id="title">⚡ Ability Paradox Generator</h1>
         <select id="langSelect" aria-label="Language">
           <option value="en">English</option>
           <option value="ko">한국어</option>
@@ -45,15 +45,55 @@
         (adsbygoogle = window.adsbygoogle || []).push({});
       </script>
 
-      <button id="generateBtn">Generate</button>
+      <button id="generateBtn">✨ Generate</button>
+
+      <div class="keyboard-hint">
+        <kbd>Enter</kbd> to generate · <kbd>ESC</kbd> to clear
+      </div>
 
       <div id="result" class="result">
         <div id="resultText"></div>
         <div id="resultActions" class="result-actions" hidden>
           <button id="copyBtn" class="action-btn">📋 Copy</button>
           <button id="shareBtn" class="action-btn">🔗 Share</button>
+          <button id="favoriteBtn" class="action-btn favorite-btn">
+            ⭐ Favorite
+          </button>
         </div>
       </div>
+
+      <!-- Stats Section -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-icon">🎲</div>
+          <div class="stat-value" id="generatedCount">0</div>
+          <div class="stat-label" id="generatedLabel">Generated</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📜</div>
+          <div class="stat-value" id="historyCount">0</div>
+          <div class="stat-label" id="historyLabel">In History</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value" id="favoriteCount">0</div>
+          <div class="stat-label" id="favoriteLabel">Favorites</div>
+        </div>
+      </div>
+
+      <!-- History Section -->
+      <section class="history-section">
+        <div class="history-header">
+          <h2 class="history-title" id="historyTitle">📚 History</h2>
+          <button id="clearHistoryBtn" class="clear-btn">🗑️ Clear</button>
+        </div>
+        <div id="historyList" class="history-list">
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p id="emptyHistoryText">No history yet. Generate something!</p>
+          </div>
+        </div>
+      </section>
 
       <!-- AdSense: Result Bottom -->
       <ins
@@ -69,9 +109,101 @@
       </script>
 
       <footer class="foot">
-        <small>© Ability Paradox Generator</small>
+        <small>© 2025 Ability Paradox Generator</small>
+        <div class="footer-links">
+          <a href="#" id="privacyLink">Privacy Policy</a>
+          <span>·</span>
+          <a
+            href="https://github.com/tac0de/ability-paradox-generator"
+            target="_blank"
+            rel="noopener"
+            >About</a
+          >
+          <span>·</span>
+          <a href="mailto:wonyoungchoiseoul@gmail.com">Contact</a>
+        </div>
+        <div class="cookie-notice">
+          <small>🍪 We use local storage & cookies for features and ads.</small>
+        </div>
       </footer>
     </main>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacyModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>📋 Privacy Policy</h2>
+          <button class="modal-close" id="closePrivacy">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h3>Last Updated: February 2025</h3>
+
+          <h4>1. Information We Collect</h4>
+          <p>
+            <strong>Local Storage Data:</strong> We store your generated
+            abilities, favorites, and statistics locally in your browser. This
+            data:
+          </p>
+          <ul>
+            <li>Never leaves your device</li>
+            <li>Is not shared with anyone</li>
+            <li>Can be deleted by clearing browser cache</li>
+          </ul>
+
+          <h4>2. Cookies & Tracking</h4>
+          <p>
+            <strong>Google AdSense:</strong> We use Google AdSense to serve ads.
+            Google may use cookies to:
+          </p>
+          <ul>
+            <li>Personalize ads based on your interests</li>
+            <li>Analyze site usage</li>
+          </ul>
+          <p>
+            You can opt out of personalized ads at
+            <a
+              href="https://www.google.com/settings/ads"
+              target="_blank"
+              rel="noopener"
+              >Google Ad Settings</a
+            >.
+          </p>
+
+          <h4>3. Third-Party Services</h4>
+          <ul>
+            <li><strong>Google AdSense:</strong> Displays advertisements</li>
+            <li>
+              <strong>Cloudflare:</strong> CDN and security (if applicable)
+            </li>
+          </ul>
+
+          <h4>4. Data Deletion</h4>
+          <p>To delete your local data:</p>
+          <ul>
+            <li>Use the "Clear History" button in the app</li>
+            <li>Clear your browser cache/cookies</li>
+          </ul>
+
+          <h4>5. Children's Privacy</h4>
+          <p>
+            This service is not directed to children under 13. We do not
+            knowingly collect personal information from children.
+          </p>
+
+          <h4>6. Contact</h4>
+          <p>
+            For privacy inquiries:
+            <a href="mailto:wonyoungchoiseoul@gmail.com">contact@example.com</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+      <span class="toast-icon">✓</span>
+      <span id="toastMessage">Copied!</span>
+    </div>
 
     <script src="main.js"></script>
   </body>
