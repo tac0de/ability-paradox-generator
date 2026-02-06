@@ -185,6 +185,7 @@ button:disabled {
   background: rgba(45, 45, 68, 0.8);
   color: var(--text);
   border: 1px solid var(--border);
+  cursor: pointer;
 }
 
 .action-btn:hover {
@@ -231,6 +232,7 @@ button:disabled {
   padding: 8px 14px;
   font-size: 0.85rem;
   border: 1px solid rgba(231, 76, 60, 0.3);
+  cursor: pointer;
 }
 
 .clear-btn:hover {
@@ -278,6 +280,7 @@ button:disabled {
   font-size: 0.8rem;
   background: rgba(45, 45, 68, 0.6);
   border: 1px solid var(--border);
+  cursor: pointer;
 }
 
 .history-action-btn:hover {
@@ -402,6 +405,7 @@ kbd {
   color: var(--primary);
   text-decoration: none;
   transition: color 0.2s ease;
+  cursor: pointer;
 }
 
 .foot a:hover {
@@ -529,6 +533,7 @@ kbd {
 .modal-body a {
   color: var(--primary);
   text-decoration: none;
+  cursor: pointer;
 }
 
 .modal-body a:hover {

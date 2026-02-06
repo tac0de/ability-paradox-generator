@@ -254,13 +254,18 @@ function addToHistory(text) {
 }
 
 // Copy history item
-window.copyHistoryItem = function (index) {
+window.copyHistoryItem = async function (index) {
   const text = history[index].text;
-  navigator.clipboard.writeText(text).then(() => {
+  try {
+    await navigator.clipboard.writeText(text);
     const lang = langSelect.value;
     const t = UI_TEXT[lang] || UI_TEXT.en;
     showToast(t.copied);
-  });
+  } catch (e) {
+    const lang = langSelect.value;
+    const t = UI_TEXT[lang] || UI_TEXT.en;
+    alert(t.copyError);
+  }
 };
 
 // Toggle favorite
