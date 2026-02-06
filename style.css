@@ -1,0 +1,86 @@
+:root {
+  --bg: #0f0f14;
+  --panel: #1c1c27;
+  --primary: #6c5ce7;
+  --text: #ffffff;
+  --muted: #c9c9d1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 680px;
+  margin: 80px auto;
+  padding: 20px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.desc {
+  color: var(--muted);
+  margin: 14px 0 22px;
+  line-height: 1.5;
+}
+
+select {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid #2b2b3a;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+button {
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.result {
+  margin-top: 22px;
+  padding: 18px;
+  background: var(--panel);
+  border-radius: 12px;
+  min-height: 64px;
+  line-height: 1.55;
+}
+
+.foot {
+  margin-top: 28px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.adsbygoogle {
+  background: transparent;
+}
