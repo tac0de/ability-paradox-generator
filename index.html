@@ -2,10 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Ability Paradox Generator</title>
+    <title>Anime Power Generator - Create Unique Anime Abilities</title>
     <meta
       name="description"
-      content="Generate anime-style abilities with a powerful strength and a critical debuff, in one sentence."
+      content="Create unique anime abilities with a twist - every power comes with a cost. Generate creative anime-style abilities and their drawbacks."
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
@@ -19,12 +19,16 @@
     <main class="container">
       <header class="top">
         <h1 id="title">⚡ Ability Paradox Generator</h1>
-        <select id="langSelect" aria-label="Language">
-          <option value="en">English</option>
-          <option value="ko">한국어</option>
-          <option value="ja">日本語</option>
-          <option value="zh">中文</option>
-        </select>
+        <div class="header-actions">
+          <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">🌓</button>
+          <button id="colorToggle" class="icon-btn" aria-label="Change color">🎨</button>
+          <select id="langSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="ko">한국어</option>
+            <option value="ja">日本語</option>
+            <option value="zh">中文</option>
+          </select>
+        </div>
       </header>
 
       <p id="desc" class="desc">
@@ -46,10 +50,6 @@
       </script>
 
       <button id="generateBtn">✨ Generate</button>
-
-      <div class="keyboard-hint">
-        <kbd>Enter</kbd> to generate · <kbd>ESC</kbd> to clear
-      </div>
 
       <div id="result" class="result">
         <div id="resultText"></div>

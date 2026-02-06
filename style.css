@@ -13,6 +13,53 @@
   --success: #00b894;
   --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   --glow: 0 0 20px rgba(108, 92, 231, 0.3);
+  --action-bg: rgba(45, 45, 68, 0.8);
+  --action-bg-hover: rgba(108, 92, 231, 0.3);
+}
+
+/* Light mode */
+[data-theme="light"] {
+  --bg: #f8f9fa;
+  --bg-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+  --panel: #ffffff;
+  --panel-gradient: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  --primary: #6c5ce7;
+  --primary-gradient: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  --secondary: #00cec9;
+  --accent: #fd79a8;
+  --text: #212529;
+  --muted: #6c757d;
+  --border: #dee2e6;
+  --success: #00b894;
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --glow: 0 0 20px rgba(108, 92, 231, 0.15);
+  --action-bg: #e9ecef;
+  --action-bg-hover: #dee2e6;
+}
+
+/* Color themes */
+[data-color="blue"] {
+  --primary: #0984e3;
+  --primary-gradient: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+  --glow: 0 0 20px rgba(9, 132, 227, 0.3);
+}
+
+[data-color="green"] {
+  --primary: #00b894;
+  --primary-gradient: linear-gradient(135deg, #00b894 0%, #55efc4 100%);
+  --glow: 0 0 20px rgba(0, 184, 148, 0.3);
+}
+
+[data-color="orange"] {
+  --primary: #e17055;
+  --primary-gradient: linear-gradient(135deg, #e17055 0%, #fab1a0 100%);
+  --glow: 0 0 20px rgba(225, 112, 85, 0.3);
+}
+
+[data-color="pink"] {
+  --primary: #fd79a8;
+  --primary-gradient: linear-gradient(135deg, #fd79a8 0%, #f8a5c2 100%);
+  --glow: 0 0 20px rgba(253, 121, 168, 0.3);
 }
 
 * {
@@ -41,6 +88,35 @@ body {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 16px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn:hover {
+  border-color: var(--primary);
+  transform: scale(1.05);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
 }
 
 h1 {
@@ -165,6 +241,14 @@ button:disabled {
   white-space: pre-wrap;
   font-size: 1.05rem;
   line-height: 1.7;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
+}
+
+#resultText.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 #resultText:empty::after {
@@ -188,14 +272,14 @@ button:disabled {
   min-width: 100px;
   padding: 12px 16px;
   font-size: 0.9rem;
-  background: rgba(45, 45, 68, 0.8);
+  background: var(--action-bg);
   color: var(--text);
   border: 1px solid var(--border);
   cursor: pointer;
 }
 
 .action-btn:hover {
-  background: rgba(108, 92, 231, 0.3);
+  background: var(--action-bg-hover);
   border-color: var(--primary);
   transform: translateY(-1px);
 }
@@ -367,24 +451,6 @@ button:disabled {
 
 .toast-icon {
   margin-right: 8px;
-}
-
-/* Keyboard hint */
-.keyboard-hint {
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.8rem;
-  margin-top: 16px;
-  opacity: 0.6;
-}
-
-kbd {
-  background: rgba(45, 45, 68, 0.8);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 0.85em;
-  font-family: inherit;
 }
 
 /* Empty state */
@@ -587,4 +653,85 @@ kbd {
 
 .loading {
   animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Generation flash effect */
+@keyframes flash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(108, 92, 231, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(108, 92, 231, 0);
+  }
+}
+
+.flash-effect {
+  animation: flash 0.6s ease-out;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .container {
+    padding: 16px;
+    margin: 20px auto;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  .desc {
+    font-size: 0.9rem;
+  }
+
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 12px 8px;
+  }
+
+  .stat-icon {
+    font-size: 1.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.3rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .result {
+    padding: 16px;
+  }
+
+  .history-actions {
+    flex-direction: column;
+  }
+
+  .history-action-btn {
+    width: 100%;
+    flex: none;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .icon-btn {
+    padding: 6px 8px;
+    font-size: 1rem;
+  }
+
+  select {
+    padding: 6px 8px;
+    font-size: 0.85rem;
+  }
 }

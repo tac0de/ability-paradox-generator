@@ -13,6 +13,12 @@ const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 const historyList = document.getElementById("historyList");
 const toast = document.getElementById("toast");
 const toastMessage = document.getElementById("toastMessage");
+const themeToggle = document.getElementById("themeToggle");
+const colorToggle = document.getElementById("colorToggle");
+
+// Theme state
+let currentTheme = localStorage.getItem("theme") || "dark";
+let currentColor = localStorage.getItem("color") || "purple";
 
 // Modal elements
 const privacyModal = document.getElementById("privacyModal");
@@ -41,8 +47,8 @@ let favorites = new Set(JSON.parse(localStorage.getItem("favorites") || "[]"));
 // UI Text Translations
 const UI_TEXT = {
   en: {
-    title: "⚡ Ability Paradox Generator",
-    desc: "Generate a single sentence describing a powerful anime-style ability and its unavoidable debuff.",
+    title: "⚡ Anime Power Generator",
+    desc: "Create unique anime abilities with a twist - every power comes with a cost.",
     btn: "✨ Generate",
     loading: "✨ Generating...",
     copy: "📋 Copy",
@@ -63,8 +69,8 @@ const UI_TEXT = {
     favorites: "Favorites",
   },
   ko: {
-    title: "⚡ 능력 패러독스 생성기",
-    desc: "강력한 애니 능력과 피할 수 없는 디버프를 한 문장으로 생성합니다.",
+    title: "⚡ 애니 능력 생성기",
+    desc: "독특한 애니 능력을 만들어보세요. 모든 능력에는 대가가 따릅니다.",
     btn: "✨ 생성하기",
     loading: "✨ 생성 중...",
     copy: "📋 복사",
@@ -85,8 +91,8 @@ const UI_TEXT = {
     favorites: "즐겨찾기",
   },
   ja: {
-    title: "⚡ 能力パラドックス生成器",
-    desc: "強力なアニメ能力と致命的な制約を一文で生成します。",
+    title: "⚡ アニメ能力生成器",
+    desc: "ユニークなアニメの能力を作成。すべての能力には代償があります。",
     btn: "✨ 生成する",
     loading: "✨ 生成中...",
     copy: "📋 コピー",
@@ -107,8 +113,8 @@ const UI_TEXT = {
     favorites: "お気に入り",
   },
   zh: {
-    title: "⚡ 能力悖论生成器",
-    desc: "生成一句包含强大能力与致命代价的动漫风格设定。",
+    title: "⚡ 动漫能力生成器",
+    desc: "创造独特的动漫能力——每个能力都有代价。",
     btn: "✨ 生成",
     loading: "✨ 生成中...",
     copy: "📋 复制",
@@ -146,6 +152,50 @@ function applyLang(lang) {
   historyLabel.textContent = t.inHistory;
   favoriteLabel.textContent = t.favorites;
 }
+
+// Theme functions
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+  currentTheme = theme;
+}
+
+function applyColor(color) {
+  if (color === "purple") {
+    document.documentElement.removeAttribute("data-color");
+  } else {
+    document.documentElement.setAttribute("data-color", color);
+  }
+  localStorage.setItem("color", color);
+  currentColor = color;
+}
+
+function toggleTheme() {
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  applyTheme(newTheme);
+  // Add flash effect to button
+  themeToggle.classList.add("flash-effect");
+  setTimeout(() => themeToggle.classList.remove("flash-effect"), 600);
+}
+
+function toggleColor() {
+  const colors = ["purple", "blue", "green", "orange", "pink"];
+  const currentIndex = colors.indexOf(currentColor);
+  const nextIndex = (currentIndex + 1) % colors.length;
+  const nextColor = colors[nextIndex];
+  applyColor(nextColor);
+  // Add flash effect to button
+  colorToggle.classList.add("flash-effect");
+  setTimeout(() => colorToggle.classList.remove("flash-effect"), 600);
+}
+
+// Initialize theme
+applyTheme(currentTheme);
+applyColor(currentColor);
+
+// Theme toggle listeners
+themeToggle.addEventListener("click", toggleTheme);
+colorToggle.addEventListener("click", toggleColor);
 
 // Detect browser language
 function detectLanguage() {
@@ -329,9 +379,14 @@ btn.addEventListener("click", async () => {
   busy = true;
   btn.disabled = true;
 
+  // Add flash effect to button
+  btn.classList.add("flash-effect");
+  setTimeout(() => btn.classList.remove("flash-effect"), 600);
+
   const lang = langSelect.value;
   const loadingText = (UI_TEXT[lang] || UI_TEXT.en).loading;
   resultText.textContent = loadingText;
+  resultText.classList.remove("show");
   resultText.classList.add("loading");
   resultActions.hidden = true;
 
@@ -348,6 +403,12 @@ btn.addEventListener("click", async () => {
     currentResult = data.result || "";
     resultText.textContent = currentResult;
     resultText.classList.remove("loading");
+
+    // Show result with animation
+    setTimeout(() => {
+      resultText.classList.add("show");
+    }, 50);
+
     resultActions.hidden = !currentResult;
 
     // Add to history and update stats
