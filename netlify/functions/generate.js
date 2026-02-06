@@ -1,10 +1,16 @@
+const fetch = require("node-fetch");
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
+    return {
+      statusCode: 405,
+      body: "Method Not Allowed",
+    };
   }
 
   try {
-    const { lang } = JSON.parse(event.body);
+    const body = event.body ? JSON.parse(event.body) : {};
+    const lang = body.lang || "en";
 
     const languageMap = {
       ko: "Korean",
@@ -22,13 +28,15 @@ Rules:
 - No character names
 - No story or worldbuilding
 - No explanations
-- Only one sentence
-- Focus on ability and its cost or limitation
+- Exactly one sentence
+- Focus only on ability and its cost or limitation
 - Tone: anime / dramatic / concise
-- Output language: ${outputLanguage}
+- Output language MUST be ${outputLanguage}
+
+If no valid sentence can be produced, output a simple example sentence.
 `;
 
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const openaiRes = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -37,41 +45,61 @@ Rules:
       body: JSON.stringify({
         model: "gpt-5-nano",
         input: prompt,
-        max_output_tokens: 60,
+        max_output_tokens: 120,
       }),
     });
 
-    const data = await response.json();
+    const rawText = await openaiRes.text();
 
-    // 🔴 핵심: 모든 text 조각을 안전하게 합침
-    let text = "";
+    if (!openaiRes.ok) {
+      throw new Error(`OpenAI error ${openaiRes.status}: ${rawText}`);
+    }
 
-    if (data.output && Array.isArray(data.output)) {
-      for (const item of data.output) {
-        if (item.content && Array.isArray(item.content)) {
-          for (const c of item.content) {
-            if (c.type === "output_text" && c.text) {
-              text += c.text;
+    let resultText = "";
+
+    try {
+      const data = JSON.parse(rawText);
+
+      if (Array.isArray(data.output)) {
+        for (const item of data.output) {
+          if (Array.isArray(item.content)) {
+            for (const c of item.content) {
+              if (c.type === "output_text" && c.text) {
+                resultText += c.text;
+              }
             }
           }
         }
       }
+    } catch (e) {
+      throw new Error("Failed to parse OpenAI response: " + rawText);
     }
 
-    text = text.trim();
+    resultText = resultText.trim();
 
-    if (!text) {
-      throw new Error("Empty model output");
+    // 🔒 최종 안전망 (절대 빈 값 반환 안 함)
+    if (!resultText) {
+      resultText =
+        "Grants overwhelming power, but each use permanently weakens the user’s body.";
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ result: text }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ result: resultText }),
     };
   } catch (err) {
+    // 🔴 디버그용: 에러를 그대로 내려보냄
     return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        error: err.message,
+      }),
     };
   }
 };
