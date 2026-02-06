@@ -20,18 +20,18 @@ exports.handler = async (event) => {
     const outputLanguage = languageMap[lang] || "English";
 
     const prompt = `
-Create ONE sentence describing an anime-style character ability with a powerful strength and a critical debuff.
+Write a short anime-style sentence describing a character ability and its serious drawback.
 
-Rules:
-- No character names
-- No story or worldbuilding
-- No explanations
-- Exactly one sentence
-- Focus only on ability and its cost or limitation
-- Tone: anime / dramatic / concise
-- Output language MUST be ${outputLanguage}
+The sentence should mention:
+- what the ability does
+- what price or limitation it has
 
-If no valid sentence can be produced, output a simple example sentence.
+Write it naturally in ${outputLanguage}.
+
+Example:
+"Can stop time, but loses a year of life each time the power is used."
+
+Now write a new sentence:
 `;
 
     const res = await fetch("https://api.openai.com/v1/responses", {
@@ -43,7 +43,7 @@ If no valid sentence can be produced, output a simple example sentence.
       body: JSON.stringify({
         model: "gpt-5-nano",
         input: prompt,
-        max_output_tokens: 120,
+        max_output_tokens: 40,
       }),
     });
 
