@@ -1,0 +1,14 @@
+# robots.txt for Ability Paradox Generator
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://ability-paradox-generator.com/sitemap.xml
+
+# Crawl-delay (optional, if needed)
+Crawl-delay: 1
+
+# Disallow specific paths (if any)
+# Disallow: /api/
+# Disallow: /private/

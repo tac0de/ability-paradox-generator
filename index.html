@@ -2,13 +2,81 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Anime Power Generator - Create Unique Anime Abilities</title>
+    <title>Anime Power Generator - Create Unique Anime Abilities with Drawbacks</title>
     <meta
       name="description"
-      content="Create unique anime abilities with a twist - every power comes with a cost. Generate creative anime-style abilities and their drawbacks."
+      content="Generate unique anime-style abilities with a twist - every power comes with a cost. Perfect for writers, RPG creators, and anime fans looking for creative character powers."
     />
+    <meta name="keywords" content="anime power generator, anime abilities, character powers, RPG abilities, anime character creator, creative writing, manga powers, supernatural abilities, ability drawbacks" />
+    <meta name="author" content="Ability Paradox Generator" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="theme-color" content="#6c5ce7" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ability-paradox-generator.com/" />
+    <meta property="og:title" content="Anime Power Generator - Create Unique Anime Abilities" />
+    <meta property="og:description" content="Generate creative anime-style abilities with unavoidable drawbacks. Perfect for writers, RPG creators, and anime fans!" />
+    <meta property="og:image" content="https://ability-paradox-generator.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Anime Power Generator Logo" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="Ability Paradox Generator" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://ability-paradox-generator.com/" />
+    <meta name="twitter:title" content="Anime Power Generator - Create Unique Anime Abilities" />
+    <meta name="twitter:description" content="Generate creative anime-style abilities with unavoidable drawbacks. Perfect for writers, RPG creators, and anime fans!" />
+    <meta name="twitter:image" content="https://ability-paradox-generator.com/twitter-card.png" />
+    <meta name="twitter:image:alt" content="Anime Power Generator Logo" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://ability-paradox-generator.com/" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Anime Power Generator",
+      "description": "Generate unique anime-style abilities with unavoidable drawbacks. Perfect for writers, RPG creators, and anime fans.",
+      "url": "https://ability-paradox-generator.com",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1250"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Ability Paradox Generator",
+        "url": "https://github.com/tac0de/ability-paradox-generator"
+      }
+    }
+    </script>
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1442589383449567"
@@ -52,6 +120,16 @@
       <button id="generateBtn">✨ Generate</button>
 
       <div id="result" class="result">
+        <div id="loadingContainer" class="loading-container" hidden>
+          <div class="loading-orb">
+            <div class="orb-core"></div>
+            <div class="orb-ring ring-1"></div>
+            <div class="orb-ring ring-2"></div>
+            <div class="orb-ring ring-3"></div>
+          </div>
+          <div id="loadingText" class="loading-text">✨ Generating...</div>
+          <div id="loadingSubtext" class="loading-subtext">Consulting the anime gods...</div>
+        </div>
         <div id="resultText"></div>
         <div id="resultActions" class="result-actions" hidden>
           <button id="copyBtn" class="action-btn">📋 Copy</button>

@@ -34,6 +34,9 @@ const historyLabel = document.getElementById("historyLabel");
 const favoriteLabel = document.getElementById("favoriteLabel");
 const historyTitle = document.getElementById("historyTitle");
 const emptyHistoryText = document.getElementById("emptyHistoryText");
+const loadingContainer = document.getElementById("loadingContainer");
+const loadingText = document.getElementById("loadingText");
+const loadingSubtext = document.getElementById("loadingSubtext");
 
 // State
 let busy = false;
@@ -384,10 +387,13 @@ btn.addEventListener("click", async () => {
   setTimeout(() => btn.classList.remove("flash-effect"), 600);
 
   const lang = langSelect.value;
-  const loadingText = (UI_TEXT[lang] || UI_TEXT.en).loading;
-  resultText.textContent = loadingText;
+  const loadingLabel = (UI_TEXT[lang] || UI_TEXT.en).loading;
+
+  // Show loading UI
+  loadingContainer.hidden = false;
+  loadingText.textContent = loadingLabel;
+  loadingSubtext.textContent = "Consulting the anime gods...";
   resultText.classList.remove("show");
-  resultText.classList.add("loading");
   resultActions.hidden = true;
 
   try {
@@ -401,8 +407,10 @@ btn.addEventListener("click", async () => {
     const data = await res.json();
 
     currentResult = data.result || "";
+
+    // Hide loading, show result
+    loadingContainer.hidden = true;
     resultText.textContent = currentResult;
-    resultText.classList.remove("loading");
 
     // Show result with animation
     setTimeout(() => {
@@ -422,6 +430,7 @@ btn.addEventListener("click", async () => {
       updateFavoriteButton();
     }
   } catch (e) {
+    loadingContainer.hidden = true;
     resultText.textContent = "Error. Please try again.";
     resultText.classList.remove("loading");
     resultActions.hidden = true;
