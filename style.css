@@ -252,6 +252,7 @@ button:disabled {
   padding: 16px;
   transition: all 0.2s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .history-item:hover {
@@ -267,6 +268,8 @@ button:disabled {
 .history-text {
   margin: 0 0 12px 0;
   line-height: 1.6;
+  color: var(--text);
+  font-size: 1rem;
 }
 
 .history-actions {
@@ -302,6 +305,7 @@ button:disabled {
   padding: 20px;
   text-align: center;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .stat-card:hover {
