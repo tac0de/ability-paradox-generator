@@ -4,6 +4,15 @@ exports.handler = async (event) => {
   }
 
   try {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return {
+        statusCode: 500,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Missing OPENAI_API_KEY" }),
+      };
+    }
+
     const { lang = "en" } = JSON.parse(event.body || "{}");
 
     const languageMap = {
@@ -32,7 +41,7 @@ Now write a new sentence.
     const res = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -52,7 +61,17 @@ Now write a new sentence.
       }),
     });
 
-    const raw = await res.json();
+    const raw = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const message =
+        raw?.error?.message ||
+        `OpenAI API error (status ${res.status})`;
+      return {
+        statusCode: res.status,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: message }),
+      };
+    }
 
     // 🔴 핵심: 모든 경로를 커버하는 텍스트 추출기
     let text = "";
@@ -76,7 +95,10 @@ Now write a new sentence.
       for (const item of raw.output) {
         if (Array.isArray(item.content)) {
           for (const c of item.content) {
-            if (c.type === "output_text" && typeof c.text === "string") {
+            if (
+              (c.type === "output_text" || c.type === "text") &&
+              typeof c.text === "string"
+            ) {
               text += c.text;
             }
           }
@@ -84,10 +106,20 @@ Now write a new sentence.
       }
     }
 
+    // 4) Chat Completions fallback (if endpoint changes)
+    if (!text && Array.isArray(raw.choices)) {
+      const choiceText = raw.choices[0]?.message?.content;
+      if (typeof choiceText === "string") text = choiceText;
+    }
+
     text = text.trim();
 
     if (!text) {
-      throw new Error("Model returned no usable text");
+      return {
+        statusCode: 502,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Model returned no usable text" }),
+      };
     }
 
     return {
@@ -97,8 +129,9 @@ Now write a new sentence.
     };
   } catch (err) {
     return {
-      statusCode: 200,
-      body: JSON.stringify({ error: err.message }),
+      statusCode: 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: err.message || "Unknown error" }),
     };
   }
 };
