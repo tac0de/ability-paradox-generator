@@ -29,6 +29,13 @@ const FALLBACKS = {
   ],
 };
 
+const LAST_SUCCESS = {
+  en: "",
+  ko: "",
+  ja: "",
+  zh: "",
+};
+
 function pickFallback(lang) {
   const list = FALLBACKS[lang] || FALLBACKS.en;
   return list[Math.floor(Math.random() * list.length)];
@@ -122,6 +129,26 @@ function buildResponse(result, debug, debugInfo) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   };
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function isRetryableError(err) {
+  const status = err?.status;
+  const code = err?.code;
+  const type = err?.type;
+  return (
+    status >= 500 ||
+    code === "server_error" ||
+    type === "server_error" ||
+    (typeof err?.message === "string" &&
+      err.message.includes("server_error"))
+  );
+}
+
+function getCachedResult(lang) {
+  const cached = LAST_SUCCESS[lang];
+  return typeof cached === "string" && cached.trim() ? cached : "";
 }
 
 exports.handler = async (event) => {
@@ -230,35 +257,66 @@ Now write a new sentence.
       });
 
       if (!res.ok) {
-        throw new Error(`OpenAI error: ${await res.text()}`);
+        const raw = await res.json().catch(() => null);
+        const message =
+          raw?.error?.message || `OpenAI error: ${res.status}`;
+        const error = new Error(message);
+        error.status = res.status;
+        error.code = raw?.error?.code;
+        error.type = raw?.error?.type;
+        error.request_id =
+          raw?.error?.request_id ||
+          raw?.error?.requestId ||
+          null;
+        throw error;
       }
 
       return res.json();
     };
 
     const tokenAttempts = [120, 200, 320];
+    const retryDelays = [0, 400, 900];
     let outputText = "";
     let lastError = null;
 
     for (const tokens of tokenAttempts) {
-      try {
-        const data = await requestOnce(tokens);
-        outputText = extractOutputText(data);
-        if (outputText.trim()) break;
-      } catch (e) {
-        lastError = e;
-        const message = e instanceof Error ? e.message : String(e);
-        if (!message.includes("max_output_tokens")) {
-          console.error("Raw OpenAI response error:", e);
-          break;
+      for (let i = 0; i < retryDelays.length; i++) {
+        try {
+          if (retryDelays[i] > 0) await sleep(retryDelays[i]);
+          const data = await requestOnce(tokens);
+          outputText = extractOutputText(data);
+          if (outputText.trim()) break;
+        } catch (e) {
+          lastError = e;
+          const message = e instanceof Error ? e.message : String(e);
+          const retryable = isRetryableError(e);
+          const isMaxToken = message.includes("max_output_tokens");
+          if (isMaxToken) {
+            break;
+          }
+          if (!retryable || i === retryDelays.length - 1) {
+            console.error("Raw OpenAI response error:", e);
+          } else {
+            console.warn("Retrying OpenAI request after server_error");
+            continue;
+          }
         }
       }
+      if (outputText.trim()) break;
     }
 
     if (!outputText.trim()) {
       const message =
         lastError instanceof Error ? lastError.message : String(lastError);
       console.error("OpenAI response failed, using fallback:", message);
+      const cached = getCachedResult(lang);
+      if (cached) {
+        return respond(cached, {
+          source: "cache",
+          reason: "openai_error",
+          error: message,
+        });
+      }
       return respond(fallbackText, {
         source: "fallback",
         reason: "openai_error",
@@ -279,15 +337,31 @@ Now write a new sentence.
     }
 
     if (!result) {
+      const cached = getCachedResult(lang);
+      if (cached) {
+        return respond(cached, {
+          source: "cache",
+          reason: "empty_result",
+        });
+      }
       return respond(fallbackText, {
         source: "fallback",
         reason: "empty_result",
       });
     }
 
+    LAST_SUCCESS[lang] = result;
     return respond(result, { source: "openai", model });
   } catch (err) {
     console.error("Function error", err);
+    const cached = getCachedResult(lang);
+    if (cached) {
+      return respond(cached, {
+        source: "cache",
+        reason: "exception",
+        error: err?.message,
+      });
+    }
     return respond(fallbackText, {
       source: "fallback",
       reason: "exception",
