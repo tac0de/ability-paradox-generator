@@ -395,6 +395,14 @@ function adjustAttitude(delta) {
   updateAttitudeDisplay();
 }
 
+function rollChaoticAttitude() {
+  // Every generation can swing mood hard to make tone feel volatile.
+  const next = Math.floor(Math.random() * 101); // 0..100
+  setAttitude(next);
+  updateAttitudeDisplay();
+  return next;
+}
+
 function updateAttitudeDisplay() {
   const attitude = getAttitude();
 
@@ -756,6 +764,9 @@ btn.addEventListener("click", async () => {
 
   // Get recent abilities for variety
   const recentAbilities = getRecentAbilities();
+
+  // Force mood volatility per generation for stronger tone shifts.
+  rollChaoticAttitude();
 
   // Get preference patterns for better generation
   const preferencePatterns = getPreferencePatterns();

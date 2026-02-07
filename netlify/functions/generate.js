@@ -322,6 +322,14 @@ function normalizePreferencePatterns(value) {
   };
 }
 
+function needsKoreanSpacingFix(text) {
+  const value = String(text || "");
+  const hangulCount = (value.match(/[가-힣]/g) || []).length;
+  const spaceCount = (value.match(/\s/g) || []).length;
+  if (hangulCount < 8) return false;
+  return spaceCount < 2;
+}
+
 // Generate a more varied system prompt
 function generateSystemPrompt() {
   const introPhrases = [
@@ -407,7 +415,7 @@ function generateUserPrompt(lang, recentAbilities = [], preferencePatterns = {})
 
   // Language-specific formatting instructions
   if (lang === "ko") {
-    prompt += `**IMPORTANT**: Use proper Korean word spacing (띄어쓰기). Put spaces between meaningful phrases/clauses for readability.\n\n`;
+    prompt += `**IMPORTANT**: Use proper Korean word spacing (띄어쓰기). Put spaces between meaningful phrases/clauses for readability. Never output Korean text as one long unspaced block.\n\n`;
   } else if (lang === "ja") {
     prompt += `**IMPORTANT**: Use natural Japanese phrasing. No spaces between words, but use punctuation appropriately.\n\n`;
   } else if (lang === "zh") {
@@ -647,6 +655,51 @@ exports.handler = async (event) => {
       return res.json();
     };
 
+    const fixKoreanSpacingIfNeeded = async (text) => {
+      if (lang !== "ko" || !needsKoreanSpacingFix(text)) return text;
+
+      const spacingSystem =
+        "You are a Korean proofreader. Fix Korean spacing only. Keep meaning and tone exactly. Output JSON only.";
+      const spacingUser =
+        `Fix spacing for this sentence while preserving wording and punctuation as much as possible:\n` +
+        `${text}\n\n` +
+        `Return JSON: {"result":"..."}`;
+
+      const res = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          reasoning: { effort: "low" },
+          text: {
+            format: responseFormat,
+            verbosity: "low",
+          },
+          input: [
+            {
+              role: "system",
+              content: [{ type: "input_text", text: spacingSystem }],
+            },
+            {
+              role: "user",
+              content: [{ type: "input_text", text: spacingUser }],
+            },
+          ],
+          max_output_tokens: 200,
+        }),
+      });
+
+      if (!res.ok) return text;
+      const data = await res.json();
+      const fixedRaw = extractOutputText(data);
+      const parsed = JSON.parse(fixedRaw);
+      const fixed = String(parsed?.result ?? "").trim();
+      return fixed || text;
+    };
+
     const tokenAttempts = [200, 500, 1000];
     const retryDelays = [0, 400, 900];
     let outputText = "";
@@ -721,6 +774,12 @@ exports.handler = async (event) => {
         source: "fallback",
         reason: "empty_result",
       });
+    }
+
+    try {
+      result = await fixKoreanSpacingIfNeeded(result);
+    } catch (spacingErr) {
+      console.warn("Korean spacing fix skipped:", spacingErr?.message || spacingErr);
     }
 
     setCachedResultForKey(cacheKey, result);
