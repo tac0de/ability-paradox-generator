@@ -8,7 +8,6 @@ const resultContainer = document.getElementById("result");
 const resultText = document.getElementById("resultText");
 const resultActions = document.getElementById("resultActions");
 const copyBtn = document.getElementById("copyBtn");
-const dismissBtn = document.getElementById("dismissBtn");
 const langSelect = document.getElementById("langSelect");
 const title = document.getElementById("title");
 const desc = document.getElementById("desc");
@@ -22,18 +21,31 @@ const loadingText = document.getElementById("loadingText");
 const privacyModal = document.getElementById("privacyModal");
 const privacyLink = document.getElementById("privacyLink");
 const closePrivacy = document.getElementById("closePrivacy");
+const closeAchievements = document.getElementById("closeAchievements");
+const closeTreasury = document.getElementById("closeTreasury");
 
 // Stats elements
 const generatedCount = document.getElementById("generatedCount");
 const generatedLabel = document.getElementById("generatedLabel");
 const comboCount = document.getElementById("comboCount");
-const attitudeDisplay = document.getElementById("attitudeDisplay");
-const dailyIndicator = document.getElementById("dailyIndicator");
+const favorLabel = document.getElementById("favorLabel");
+const saveBtn = document.getElementById("saveBtn");
+const achievementsBtn = document.getElementById("achievementsBtn");
+const treasuryBtn = document.getElementById("treasuryBtn");
+const privacyTitle = document.getElementById("privacyTitle");
+const achievementsTitle = document.getElementById("achievementsTitle");
+const treasuryTitle = document.getElementById("treasuryTitle");
+const aboutLink = document.getElementById("aboutLink");
+const contactLink = document.getElementById("contactLink");
+const footerNote = document.getElementById("footerNote");
+const exportTreasuryBtn = document.getElementById("exportTreasury");
+const clearTreasuryBtn = document.getElementById("clearTreasury");
 
 // State
 let busy = false;
 let currentResult = "";
 let currentRarity = "";
+let currentResultHandled = false;
 let generatedTotal = parseInt(localStorage.getItem("divine_generatedTotal") || "0");
 let hasGenerated = false;
 
@@ -118,7 +130,7 @@ function updateComboDisplay() {
   const combo = getCombo();
   const comboElement = document.getElementById("comboCount");
   if (comboElement) {
-    comboElement.textContent = combo > 0 ? `${combo}x` : "";
+    comboElement.textContent = `${Math.max(combo, 0) + 1}x`;
   }
 
   // Update god entity visual based on combo
@@ -650,11 +662,18 @@ function updateButtonText(lang) {
   }
 }
 
+function getRarityLabel(rarityName, lang) {
+  const t = UI_TEXT[lang] || UI_TEXT.en;
+  return t.rarityLabels?.[rarityName] || rarityName;
+}
+
 // =====================================================
 // UI TEXT TRANSLATIONS
 // =====================================================
 const UI_TEXT = {
   en: {
+    langLabel: "Language",
+    close: "Close",
     title: "Receive Your Gift",
     desc: "The Divine Entity offers you power, but every blessing carries its burden.",
     btn: "Receive",
@@ -662,12 +681,38 @@ const UI_TEXT = {
     copy: "Copy",
     copied: "Copied",
     copyError: "Copy failed",
-    dismiss: "Dismiss",
+    save: "Archive Relic",
+    saveSuccess: "Relic archived",
+    saveDuplicate: "Already archived",
     generated: "Gifts Received",
+    divineFavor: "Divine Favor",
+    achievements: "Achievements",
+    treasury: "Treasury",
+    privacy: "Privacy",
+    about: "About",
+    contact: "Contact",
+    privacyTitle: "Privacy Policy",
+    achievementsTitle: "Achievements",
+    treasuryTitle: "Your Treasury",
+    exportCollection: "Export Collection",
+    clearAll: "Clear All",
+    legendaryGift: "✨ LEGENDARY GIFT ✨",
+    treasuryEmptyTitle: "Your treasury is empty.",
+    treasuryEmptyDesc: "Save abilities to build your collection.",
+    removedFromTreasury: "Removed from Treasury",
+    treasuryIsEmpty: "Treasury is empty",
+    exportedCollection: "Collection exported to clipboard",
+    exportFailed: "Export failed",
+    clearConfirm: "Are you sure you want to clear your entire treasury? This cannot be undone.",
+    treasuryCleared: "Treasury cleared",
+    footerNote: "© 2025 The Divine Paradox",
     emptyResult: "Your gift will appear here",
     error: "The Divine Entity is silent. Try again.",
+    rarityLabels: { common: "common", rare: "rare", epic: "epic", legendary: "legendary" },
   },
   ko: {
+    langLabel: "언어",
+    close: "닫기",
     title: "당신의 선물을 받으세요",
     desc: "신성한 존재가 당신에게 힘을 제안하지만, 모든 축복에는 짐이 따릅니다.",
     btn: "받기",
@@ -675,12 +720,38 @@ const UI_TEXT = {
     copy: "복사",
     copied: "복사됨",
     copyError: "복사 실패",
-    dismiss: "무시하기",
+    save: "성물 봉인",
+    saveSuccess: "성물함에 봉인됨",
+    saveDuplicate: "이미 봉인된 성물",
     generated: "받은 선물",
+    divineFavor: "신의 총애",
+    achievements: "업적",
+    treasury: "보물고",
+    privacy: "개인정보",
+    about: "소개",
+    contact: "문의",
+    privacyTitle: "개인정보 처리방침",
+    achievementsTitle: "업적",
+    treasuryTitle: "당신의 보물고",
+    exportCollection: "컬렉션 내보내기",
+    clearAll: "전체 삭제",
+    legendaryGift: "✨ 전설의 선물 ✨",
+    treasuryEmptyTitle: "보물고가 비어 있습니다.",
+    treasuryEmptyDesc: "능력을 저장해 컬렉션을 쌓아보세요.",
+    removedFromTreasury: "보물고에서 제거됨",
+    treasuryIsEmpty: "보물고가 비어 있습니다",
+    exportedCollection: "컬렉션을 클립보드로 내보냈습니다",
+    exportFailed: "내보내기 실패",
+    clearConfirm: "보물고를 전부 비우시겠어요? 이 작업은 되돌릴 수 없습니다.",
+    treasuryCleared: "보물고를 비웠습니다",
+    footerNote: "© 2025 The Divine Paradox",
     emptyResult: "당신의 선물이 여기에 나타납니다",
     error: "신성한 존재가 침묵합니다. 다시 시도하세요.",
+    rarityLabels: { common: "일반", rare: "희귀", epic: "영웅", legendary: "전설" },
   },
   ja: {
+    langLabel: "言語",
+    close: "閉じる",
     title: "贈り物を受け取る",
     desc: "神聖な存在が力を捧げるが、全ての祝福には重荷が伴う。",
     btn: "受け取る",
@@ -688,12 +759,38 @@ const UI_TEXT = {
     copy: "コピー",
     copied: "コピーしました",
     copyError: "コピー失敗",
-    dismiss: "閉じる",
+    save: "聖遺物として収蔵",
+    saveSuccess: "宝物庫に収蔵しました",
+    saveDuplicate: "すでに収蔵済みです",
     generated: "受け取った贈り物",
+    divineFavor: "神の加護",
+    achievements: "実績",
+    treasury: "宝物庫",
+    privacy: "プライバシー",
+    about: "概要",
+    contact: "連絡先",
+    privacyTitle: "プライバシーポリシー",
+    achievementsTitle: "実績",
+    treasuryTitle: "あなたの宝物庫",
+    exportCollection: "コレクションを書き出す",
+    clearAll: "すべて削除",
+    legendaryGift: "✨ 伝説の贈り物 ✨",
+    treasuryEmptyTitle: "宝物庫は空です。",
+    treasuryEmptyDesc: "能力を保存してコレクションを作りましょう。",
+    removedFromTreasury: "宝物庫から削除しました",
+    treasuryIsEmpty: "宝物庫は空です",
+    exportedCollection: "コレクションをクリップボードに書き出しました",
+    exportFailed: "書き出しに失敗しました",
+    clearConfirm: "宝物庫をすべて消去しますか？この操作は元に戻せません。",
+    treasuryCleared: "宝物庫を消去しました",
+    footerNote: "© 2025 The Divine Paradox",
     emptyResult: "あなたの贈り物がここに現れます",
     error: "神聖な存在が沈黙しています。もう一度試してください。",
+    rarityLabels: { common: "コモン", rare: "レア", epic: "エピック", legendary: "レジェンダリー" },
   },
   zh: {
+    langLabel: "语言",
+    close: "关闭",
     title: "接受你的恩赐",
     desc: "神圣存在赐予你力量，但每个祝福都伴随着负担。",
     btn: "接受",
@@ -701,10 +798,34 @@ const UI_TEXT = {
     copy: "复制",
     copied: "已复制",
     copyError: "复制失败",
-    dismiss: "关闭",
+    save: "封存圣物",
+    saveSuccess: "已封存入宝库",
+    saveDuplicate: "宝库中已存在",
     generated: "已接收恩赐",
+    divineFavor: "神之眷顾",
+    achievements: "成就",
+    treasury: "宝库",
+    privacy: "隐私",
+    about: "关于",
+    contact: "联系",
+    privacyTitle: "隐私政策",
+    achievementsTitle: "成就",
+    treasuryTitle: "你的宝库",
+    exportCollection: "导出收藏",
+    clearAll: "全部清空",
+    legendaryGift: "✨ 传说恩赐 ✨",
+    treasuryEmptyTitle: "宝库是空的。",
+    treasuryEmptyDesc: "保存能力来建立你的收藏。",
+    removedFromTreasury: "已从宝库移除",
+    treasuryIsEmpty: "宝库为空",
+    exportedCollection: "收藏已导出到剪贴板",
+    exportFailed: "导出失败",
+    clearConfirm: "确定要清空整个宝库吗？此操作无法撤销。",
+    treasuryCleared: "宝库已清空",
+    footerNote: "© 2025 The Divine Paradox",
     emptyResult: "你的恩赐将出现在这里",
     error: "神圣存在保持沉默。请再试一次。",
+    rarityLabels: { common: "普通", rare: "稀有", epic: "史诗", legendary: "传说" },
   },
 };
 
@@ -716,11 +837,73 @@ function applyLang(lang) {
   title.textContent = t.title;
   desc.textContent = t.desc;
   copyBtn.textContent = t.copy;
-  const dismissBtn = document.getElementById("dismissBtn");
-  if (dismissBtn) {
-    dismissBtn.textContent = t.dismiss;
+  if (saveBtn) {
+    saveBtn.textContent = t.save;
+  }
+  if (resultText) {
+    resultText.setAttribute("data-placeholder", t.emptyResult);
+  }
+  if (langSelect) {
+    langSelect.setAttribute("aria-label", t.langLabel);
+  }
+  if (closePrivacy) {
+    closePrivacy.setAttribute("aria-label", t.close);
+  }
+  if (closeAchievements) {
+    closeAchievements.setAttribute("aria-label", t.close);
+  }
+  if (closeTreasury) {
+    closeTreasury.setAttribute("aria-label", t.close);
+  }
+  if (favorLabel) {
+    favorLabel.textContent = t.divineFavor;
+  }
+  if (achievementsBtn) {
+    achievementsBtn.textContent = t.achievements;
+  }
+  if (treasuryBtn) {
+    treasuryBtn.textContent = t.treasury;
+  }
+  if (privacyLink) {
+    privacyLink.textContent = t.privacy;
+  }
+  if (aboutLink) {
+    aboutLink.textContent = t.about;
+  }
+  if (contactLink) {
+    contactLink.textContent = t.contact;
+  }
+  if (privacyTitle) {
+    privacyTitle.textContent = t.privacyTitle;
+  }
+  if (achievementsTitle) {
+    achievementsTitle.textContent = t.achievementsTitle;
+  }
+  if (treasuryTitle) {
+    treasuryTitle.textContent = t.treasuryTitle;
+  }
+  if (exportTreasuryBtn) {
+    exportTreasuryBtn.textContent = t.exportCollection;
+  }
+  if (clearTreasuryBtn) {
+    clearTreasuryBtn.textContent = t.clearAll;
+  }
+  if (footerNote) {
+    footerNote.textContent = t.footerNote;
   }
   generatedLabel.textContent = t.generated;
+
+  const rarityBadge = document.getElementById("rarityBadge");
+  if (rarityBadge && currentRarity) {
+    rarityBadge.textContent = getRarityLabel(currentRarity, lang);
+  }
+
+  if (achievementsModal && achievementsModal.classList.contains("show")) {
+    populateAchievements();
+  }
+  if (treasuryModal && treasuryModal.classList.contains("show")) {
+    populateTreasury();
+  }
 
   // Update button text based on state
   updateButtonText(lang);
@@ -773,13 +956,30 @@ btn.addEventListener("click", async () => {
     godEntity.classList.add("active");
   }
 
+  // Skip is now inferred only when moving on without saving/copying.
+  if (currentResult && !currentResultHandled) {
+    addSkippedAbility(currentResult);
+    resetCombo();
+    adjustAttitude(-5);
+    currentResult = "";
+    currentRarity = "";
+  }
+
   // Show loading UI
   loadingContainer.hidden = false;
   loadingText.textContent = t.loading;
   resultText.classList.remove("show");
   resultText.textContent = "";
   resultContainer.classList.remove("has-result");
+  resultContainer.classList.remove("rarity-common", "rarity-rare", "rarity-epic", "rarity-legendary");
   resultActions.hidden = true;
+
+  // Hide rarity badge during loading
+  const rarityBadge = document.getElementById("rarityBadge");
+  if (rarityBadge) {
+    rarityBadge.classList.remove("show");
+    rarityBadge.classList.add("hidden");
+  }
 
   // Remove button pulse during loading
   btn.classList.remove("ready");
@@ -806,6 +1006,7 @@ btn.addEventListener("click", async () => {
     loadingContainer.hidden = true;
 
     if (currentResult) {
+      currentResultHandled = false;
       resultContainer.classList.add("has-result");
 
       // Use reveal animation
@@ -831,10 +1032,33 @@ btn.addEventListener("click", async () => {
       const rarity = generateRarity(combo);
       currentRarity = rarity.name;
 
-      // Apply rarity visual effect
-      const rarityColor = getRarityColor(rarity.name);
-      resultContainer.style.borderColor = rarityColor;
-      resultContainer.style.boxShadow = `0 0 20px ${rarityColor}40`;
+      // Apply enhanced rarity visual effects
+      resultContainer.classList.remove("rarity-common", "rarity-rare", "rarity-epic", "rarity-legendary");
+      resultContainer.classList.add(`rarity-${rarity.name}`);
+
+      // Show and update rarity badge
+      const rarityBadge = document.getElementById("rarityBadge");
+      if (rarityBadge) {
+        rarityBadge.classList.remove("common", "rare", "epic", "legendary");
+        rarityBadge.classList.add(rarity.name);
+        rarityBadge.textContent = getRarityLabel(rarity.name, lang);
+        rarityBadge.classList.remove("hidden");
+
+        // Trigger badge reveal animation
+        setTimeout(() => rarityBadge.classList.add("show"), 50);
+
+        // Special effect for legendary
+        if (rarity.name === "legendary") {
+          // Intense god entity activation
+          if (godEntity) {
+            godEntity.classList.add("legendary-reveal");
+            setTimeout(() => {
+              godEntity.classList.remove("legendary-reveal");
+            }, 2000);
+          }
+          showToast(t.legendaryGift, 4000);
+        }
+      }
 
       // Update stats
       generatedTotal++;
@@ -847,7 +1071,6 @@ btn.addEventListener("click", async () => {
       // GAME SYSTEMS: Update displays
       updateComboDisplay();
       updateAttitudeDisplay();
-      updateDailyDisplay();
     } else {
       resultText.textContent = t.error;
       resultText.classList.add("show");
@@ -885,6 +1108,7 @@ copyBtn.addEventListener("click", async () => {
 
     // Track that user liked this ability
     addLikedAbility(currentResult);
+    currentResultHandled = true;
 
     // GAME SYSTEMS: Increase attitude (pleases the God)
     adjustAttitude(3);
@@ -899,34 +1123,6 @@ copyBtn.addEventListener("click", async () => {
 });
 
 // =====================================================
-// DISMISS RESULT
-// =====================================================
-if (dismissBtn) {
-  dismissBtn.addEventListener("click", () => {
-    if (!currentResult) return;
-
-    // Track that user skipped this ability
-    addSkippedAbility(currentResult);
-
-    // GAME SYSTEMS: Reset combo (dismiss breaks combo)
-    resetCombo();
-
-    // GAME SYSTEMS: Decrease attitude slightly (displeases the God)
-    adjustAttitude(-5);
-
-    // Clear result
-    currentResult = "";
-    currentRarity = "";
-    resultText.innerHTML = "";
-    resultText.classList.remove("show", "reveal");
-    resultContainer.classList.remove("has-result");
-    resultActions.hidden = true;
-    resultContainer.style.borderColor = "";
-    resultContainer.style.boxShadow = "";
-  });
-}
-
-// =====================================================
 // LANGUAGE CHANGE
 // =====================================================
 langSelect.addEventListener("change", () => {
@@ -937,7 +1133,7 @@ langSelect.addEventListener("change", () => {
 // KEYBOARD SHORTCUTS
 // =====================================================
 document.addEventListener("keydown", (e) => {
-  // ESC to close modal or clear result
+  // ESC to close modal
   if (e.key === "Escape") {
     // Close any open modals first
     if (privacyModal.classList.contains("show")) {
@@ -946,25 +1142,6 @@ document.addEventListener("keydown", (e) => {
       achievementsModal.classList.remove("show");
     } else if (treasuryModal && treasuryModal.classList.contains("show")) {
       treasuryModal.classList.remove("show");
-    } else if (currentResult) {
-      // Track that user skipped this ability
-      addSkippedAbility(currentResult);
-
-      // GAME SYSTEMS: Reset combo (dismiss breaks combo)
-      resetCombo();
-
-      // GAME SYSTEMS: Decrease attitude slightly
-      adjustAttitude(-5);
-
-      // Clear result
-      currentResult = "";
-      currentRarity = "";
-      resultText.innerHTML = "";
-      resultText.classList.remove("show", "reveal");
-      resultContainer.classList.remove("has-result");
-      resultActions.hidden = true;
-      resultContainer.style.borderColor = "";
-      resultContainer.style.boxShadow = "";
     }
   }
 
@@ -999,7 +1176,6 @@ privacyModal.addEventListener("click", (e) => {
 // =====================================================
 // SAVE TO TREASURY
 // =====================================================
-const saveBtn = document.getElementById("saveBtn");
 if (saveBtn) {
   saveBtn.addEventListener("click", () => {
     if (!currentResult) return;
@@ -1008,12 +1184,15 @@ if (saveBtn) {
     if (saved) {
       const lang = langSelect.value;
       const t = UI_TEXT[lang] || UI_TEXT.en;
-      showToast("Saved to Treasury", 2000);
+      showToast(t.saveSuccess, 2000);
+      currentResultHandled = true;
 
       // Check achievements (for collector achievements)
       checkAchievements(lang);
     } else {
-      showToast("Already in Treasury", 2000);
+      const lang = langSelect.value;
+      const t = UI_TEXT[lang] || UI_TEXT.en;
+      showToast(t.saveDuplicate, 2000);
     }
   });
 }
@@ -1021,9 +1200,7 @@ if (saveBtn) {
 // =====================================================
 // ACHIEVEMENTS MODAL
 // =====================================================
-const achievementsBtn = document.getElementById("achievementsBtn");
 const achievementsModal = document.getElementById("achievementsModal");
-const closeAchievements = document.getElementById("closeAchievements");
 
 if (achievementsBtn && achievementsModal) {
   achievementsBtn.addEventListener("click", () => {
@@ -1075,11 +1252,7 @@ function populateAchievements() {
 // =====================================================
 // TREASURY MODAL
 // =====================================================
-const treasuryBtn = document.getElementById("treasuryBtn");
 const treasuryModal = document.getElementById("treasuryModal");
-const closeTreasury = document.getElementById("closeTreasury");
-const exportTreasuryBtn = document.getElementById("exportTreasury");
-const clearTreasuryBtn = document.getElementById("clearTreasury");
 
 if (treasuryBtn && treasuryModal) {
   treasuryBtn.addEventListener("click", () => {
@@ -1103,6 +1276,8 @@ if (treasuryModal) {
 }
 
 function populateTreasury() {
+  const lang = langSelect.value;
+  const t = UI_TEXT[lang] || UI_TEXT.en;
   const treasuryList = document.getElementById("treasuryList");
   if (!treasuryList) return;
 
@@ -1111,8 +1286,8 @@ function populateTreasury() {
   if (treasury.length === 0) {
     treasuryList.innerHTML = `
       <div style="text-align: center; color: var(--text-muted); padding: 40px;">
-        <p>Your treasury is empty.</p>
-        <p style="font-size: 13px; margin-top: 8px;">Save abilities to build your collection.</p>
+        <p>${t.treasuryEmptyTitle}</p>
+        <p style="font-size: 13px; margin-top: 8px;">${t.treasuryEmptyDesc}</p>
       </div>
     `;
     return;
@@ -1126,7 +1301,7 @@ function populateTreasury() {
       <div class="treasury-item rarity-${item.rarity}">
         <div class="treasury-ability">${item.ability}</div>
         <div class="treasury-meta">
-          <span class="treasury-rarity" style="color: ${rarityColor}">${item.rarity}</span>
+          <span class="treasury-rarity" style="color: ${rarityColor}">${getRarityLabel(item.rarity, lang)}</span>
           <span>${date}</span>
           <button class="treasury-delete" onclick="deleteFromTreasury(${index})">×</button>
         </div>
@@ -1137,59 +1312,45 @@ function populateTreasury() {
 
 // Global function for delete button
 window.deleteFromTreasury = function(index) {
+  const lang = langSelect.value;
+  const t = UI_TEXT[lang] || UI_TEXT.en;
   const treasury = getTreasury();
   if (index >= 0 && index < treasury.length) {
     const item = treasury[index];
     removeFromTreasury(item.ability);
     populateTreasury();
-    showToast("Removed from Treasury", 2000);
+    showToast(t.removedFromTreasury, 2000);
   }
 };
 
 if (exportTreasuryBtn) {
   exportTreasuryBtn.addEventListener("click", () => {
+    const lang = langSelect.value;
+    const t = UI_TEXT[lang] || UI_TEXT.en;
     const treasury = getTreasury();
     if (treasury.length === 0) {
-      showToast("Treasury is empty", 2000);
+      showToast(t.treasuryIsEmpty, 2000);
       return;
     }
 
     const text = treasury.map(item => `[${item.rarity.toUpperCase()}] ${item.ability}`).join("\n\n");
 
     navigator.clipboard.writeText(text).then(() => {
-      showToast("Collection exported to clipboard", 3000);
+      showToast(t.exportedCollection, 3000);
     }).catch(() => {
-      showToast("Export failed", 2000);
+      showToast(t.exportFailed, 2000);
     });
   });
 }
 
 if (clearTreasuryBtn) {
   clearTreasuryBtn.addEventListener("click", () => {
-    if (confirm("Are you sure you want to clear your entire treasury? This cannot be undone.")) {
+    const lang = langSelect.value;
+    const t = UI_TEXT[lang] || UI_TEXT.en;
+    if (confirm(t.clearConfirm)) {
       localStorage.setItem(TREASURY_KEY, JSON.stringify([]));
       populateTreasury();
-      showToast("Treasury cleared", 2000);
-    }
-  });
-}
-
-// =====================================================
-// DAILY BLESSING HANDLER
-// =====================================================
-if (dailyIndicator) {
-  dailyIndicator.addEventListener("click", () => {
-    if (isDailyAvailable()) {
-      claimDaily();
-      updateDailyDisplay();
-      showToast("Daily Blessing claimed!", 3000);
-      // Trigger generation
-      btn.click();
-    } else {
-      const daily = getDailyData();
-      if (daily && daily.ability) {
-        showToast("Already claimed today. Come back tomorrow!", 3000);
-      }
+      showToast(t.treasuryCleared, 2000);
     }
   });
 }
@@ -1204,6 +1365,5 @@ updateStats();
 // Initialize game systems
 updateComboDisplay();
 updateAttitudeDisplay();
-updateDailyDisplay();
 
 // No auto-focus on load - let user discover naturally

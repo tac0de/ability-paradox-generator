@@ -144,10 +144,10 @@
           <div class="loading-pulse"></div>
           <p id="loadingText" class="loading-text">The Divine Entity shifts...</p>
         </div>
+        <div id="rarityBadge" class="rarity-badge" hidden></div>
         <div id="resultText" class="result-text"></div>
         <div id="resultActions" class="result-actions" hidden>
           <button id="saveBtn" class="btn-save">Save</button>
-          <button id="dismissBtn" class="btn-dismiss">Dismiss</button>
           <button id="copyBtn" class="btn-copy">Copy</button>
         </div>
       </div>
@@ -160,15 +160,7 @@
         </div>
         <div class="stat-item">
           <span id="comboCount" class="combo-count"></span>
-          <span class="stat-label">Divine Favor</span>
-        </div>
-        <div class="stat-item">
-          <span id="attitudeDisplay" class="attitude-display"></span>
-          <span class="stat-label">God's Mood</span>
-        </div>
-        <div class="stat-item daily-wrapper">
-          <span id="dailyIndicator" class="daily-indicator"></span>
-          <span class="stat-label">Daily Blessing</span>
+          <span id="favorLabel" class="stat-label">Divine Favor</span>
         </div>
       </div>
 
@@ -194,10 +186,10 @@
       <footer class="footer">
         <div class="footer-links">
           <a href="#" id="privacyLink">Privacy</a>
-          <a href="https://github.com/tac0de/ability-paradox-generator" target="_blank" rel="noopener">About</a>
-          <a href="mailto:wonyoungchoiseoul@gmail.com">Contact</a>
+          <a id="aboutLink" href="https://github.com/tac0de/ability-paradox-generator" target="_blank" rel="noopener">About</a>
+          <a id="contactLink" href="mailto:wonyoungchoiseoul@gmail.com">Contact</a>
         </div>
-        <p class="footer-note">© 2025 The Divine Paradox</p>
+        <p id="footerNote" class="footer-note">© 2025 The Divine Paradox</p>
       </footer>
     </main>
 
@@ -205,7 +197,7 @@
     <div id="privacyModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Privacy Policy</h2>
+          <h2 id="privacyTitle">Privacy Policy</h2>
           <button class="modal-close" id="closePrivacy" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -259,7 +251,7 @@
     <div id="achievementsModal" class="modal">
       <div class="modal-content modal-large">
         <div class="modal-header">
-          <h2>Achievements</h2>
+          <h2 id="achievementsTitle">Achievements</h2>
           <button class="modal-close" id="closeAchievements" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -274,7 +266,7 @@
     <div id="treasuryModal" class="modal">
       <div class="modal-content modal-large">
         <div class="modal-header">
-          <h2>Your Treasury</h2>
+          <h2 id="treasuryTitle">Your Treasury</h2>
           <button class="modal-close" id="closeTreasury" aria-label="Close"></button>
         </div>
         <div class="modal-body">
