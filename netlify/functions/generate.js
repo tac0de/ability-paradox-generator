@@ -256,7 +256,7 @@ function isAllowedOrigin(origin) {
   if (!origin) return true;
   const o = String(origin);
   return (
-    o.includes("ability-paradox-generator.netlify.app") ||
+    o.includes("thedivineparadox.com") ||
     o.includes("ability-paradox-generator.com") ||
     o.includes("localhost") ||
     o.includes("127.0.0.1")
