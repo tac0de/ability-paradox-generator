@@ -8,6 +8,10 @@
     "strict": false,
     "skipLibCheck": true
   },
-  "include": ["netlify/functions/**/*.js", "js/**/*.js", "main.js"]
+  "include": [
+    "netlify/functions/**/*.js",
+    "netlify/functions/**/*.ts",
+    "js/**/*.js",
+    "main.js"
+  ]
 }
-

@@ -18,7 +18,7 @@
   - `style.css`: 테마/애니메이션/반응형 스타일
   - `main.js`: 앱 상태, i18n, 생성 플로우, 게임 시스템, 로컬스토리지
 - 백엔드:
-  - `netlify/functions/generate.js`: `/api/generate` 처리
+  - `netlify/functions/generate.ts`: `/api/generate` 처리
   - OpenAI Responses API 호출 + JSON schema 출력 강제 + 폴백/재시도
 - 라우팅:
   - `netlify.toml`에서 `/api/generate -> /.netlify/functions/generate`
@@ -88,6 +88,8 @@
 - 코드 분리는 "여러 마이크로 사이트에서 복붙 가능한 단위"를 목표로 한다.
 
 ### Recent Changes
+- 2026-02-08: `generate.ts`의 `preferencePatterns`를 명시 타입(`PreferencePatterns`)으로 고정해 functions-only TypeScript 전환 시 발생한 TS2339 속성 접근 오류를 해결.
+- 2026-02-08: `netlify/functions/generate.js`를 `generate.ts`로 전환하고, 함수 전용 TypeScript 체크를 위해 `tsconfig.json` include에 `netlify/functions/**/*.ts`를 추가.
 - 2026-02-07: Gumroad 수익화 UI는 임시 비활성화(주석 처리). i18n 텍스트 테이블을 `js/text.js`로 분리하고 `main.js`는 `window.DP_TEXT`를 사용하도록 변경.
 - 2026-02-07: 무제한 느낌 유지하면서 비용 보호를 위해 `/api/generate`에 베스트에포트 레이트리밋/짧은 캐시/입력 캡(서버)과 생성 버튼 소프트 쿨다운(클라이언트) 추가.
 - 2026-02-07: 재사용성 강화를 위해 `js/config.js`, `js/state.js`, `js/api.js`, `js/ui.js`, `js/systems/rarity.js`로 분리하고 `main.js`는 엔트리/조립 역할로 축소. `zod` 검증 및 lint/format/typecheck 툴링 설정 추가.

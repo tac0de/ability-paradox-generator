@@ -3,6 +3,26 @@
 // =====================================================
 const { z } = require("zod");
 
+/**
+ * Minimal typed shape for OpenAI/API errors we annotate during request handling.
+ */
+type EnrichedError = Error & {
+  status?: number;
+  code?: string;
+  type?: string;
+  request_id?: string | null;
+};
+
+type PreferencePatterns = {
+  likedCount: number;
+  skippedCount: number;
+  totalGenerated: number;
+  combo: number;
+  attitude: number;
+  recentLiked: string[];
+  recentSkipped: string[];
+};
+
 const FALLBACKS = {
   en: [
     "Can rewrite reality itself, but each alteration permanently erases one of your own memories.",
@@ -309,14 +329,21 @@ function normalizeStringArray(value, maxItems, maxCharsPerItem) {
   return out;
 }
 
-function normalizePreferencePatterns(value) {
-  const obj = (value && typeof value === "object") ? value : {};
+function toFiniteNumber(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function normalizePreferencePatterns(value: unknown): PreferencePatterns {
+  const obj =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
   return {
-    likedCount: Number.isFinite(obj.likedCount) ? obj.likedCount : 0,
-    skippedCount: Number.isFinite(obj.skippedCount) ? obj.skippedCount : 0,
-    totalGenerated: Number.isFinite(obj.totalGenerated) ? obj.totalGenerated : 0,
-    combo: Number.isFinite(obj.combo) ? obj.combo : 0,
-    attitude: Number.isFinite(obj.attitude) ? obj.attitude : 50,
+    likedCount: toFiniteNumber(obj.likedCount, 0),
+    skippedCount: toFiniteNumber(obj.skippedCount, 0),
+    totalGenerated: toFiniteNumber(obj.totalGenerated, 0),
+    combo: toFiniteNumber(obj.combo, 0),
+    attitude: toFiniteNumber(obj.attitude, 50),
     recentLiked: normalizeStringArray(obj.recentLiked, 3, 180),
     recentSkipped: normalizeStringArray(obj.recentSkipped, 2, 180),
   };
@@ -399,7 +426,19 @@ function getCulturalContext(lang) {
 }
 
 // Generate varied user prompt with context and preference learning
-function generateUserPrompt(lang, recentAbilities = [], preferencePatterns = {}) {
+function generateUserPrompt(
+  lang,
+  recentAbilities = [],
+  preferencePatterns: PreferencePatterns = {
+    likedCount: 0,
+    skippedCount: 0,
+    totalGenerated: 0,
+    combo: 0,
+    attitude: 50,
+    recentLiked: [],
+    recentSkipped: [],
+  },
+) {
   const languageMap = {
     ko: "Korean (한국어)",
     ja: "Japanese (日本語)",
@@ -641,7 +680,7 @@ exports.handler = async (event) => {
         const raw = await res.json().catch(() => null);
         const message =
           raw?.error?.message || `OpenAI error: ${res.status}`;
-        const error = new Error(message);
+        const error = new Error(message) as EnrichedError;
         error.status = res.status;
         error.code = raw?.error?.code;
         error.type = raw?.error?.type;
